@@ -32,10 +32,16 @@ git clone https://github.com/airdropalc/Web-Server.git
 cd Web-Server
 ```
 
-**2. Add Your Files**
+**2: Install Dependencies**
+Install the required Node.js packages.
+```bash
+npm install
+```
+
+**3. Add Your Files**
 Place any files you want to share or host into the `public/` directory.
 
-**3. Run the Server**
+**4. Run the Server**
 Execute the main script from your terminal.
 ```bash
 npm run dev
