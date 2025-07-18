@@ -44,7 +44,7 @@ Place any files you want to share or host into the `public/` directory.
 **4. Run the Server**
 Execute the main script from your terminal.
 ```bash
-npm run dev
+node index.js
 ```
 *running on localhost:3000*
 
