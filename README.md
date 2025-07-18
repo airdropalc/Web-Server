@@ -40,6 +40,8 @@ Execute the main script from your terminal.
 ```bash
 npm run dev
 ```
+*running on localhost:3000*
+
 You should see a message in your console, such as `Server running at http://localhost:8080`. You can now access your files through your web browser at that address.
 
 ---
@@ -55,3 +57,13 @@ We welcome ideas, improvements, and contributions from everyone in the community
 5.  **Submit a pull request** for us to review.
 
 Don't hesitate to reach out if you have any questions. Let's build something great together!
+
+---
+> Inspired by and developed for the [Airdrop ALC](https://t.me/airdropalc) community.
+
+## License
+
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
+
+---
