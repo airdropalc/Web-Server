@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirdropALC - Octra FileHub</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="logo_alc01.svg" sizes="180x180" type="image/png">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="logo_alc.png" alt="Octra Logo" class="logo">
+                <div class="title-container">
+                    <h1>AirdropALC</h1>
+                    <p class="subtitle">Download file the Octra testnet wallet that you created</p>
+                </div>
+            </div>
+            <div class="header-links">
+                <a href="https://octra.org/" class="header-link" target="_blank">Octra Website</a>
+                <a href="https://t.me/airdropalc" class="header-link" target="_blank">AirdropALC Channel</a>
+                <a href="https://t.me/Re_Rowet" class="header-link" target="_blank">Contact Us</a>
+            </div>
+            <div class="header-info">
+                <div class="stats">
+                    <a href="https://octra-airdropalc.pagekite.me/" class="wallet-link" id="walletGeneration" target="_blank">Octra Wallet Generation</a>
+                    <span id="totalFiles">0 files</span>
+                    <span id="availableFiles">0 available</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search files...">
+            <button id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+
+        <div class="file-table-container">
+            <table id="fileTable">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Last Modified</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="fileList">
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <p>The platform used to download Octra wallet files.</p>
+            <p>This platform is for community use only. If you are not part of the AirdropALC community,</p>
+            <p>Octra and AirdropALC are not responsible for any losses.</p><br>
+            <p>&copy; 2023 Octra FileHub. A product of AirdropALC.</p>
+        </div>
+    </footer>
+
+    <div id="warningPopup" class="warning-popup">
+        <div class="warning-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Important Notice</h3>
+            <p>This platform is exclusively for the AirdropALC community. By proceeding, you acknowledge that:</p>
+            <ul class="warning-list">
+                <li><i class="fas fa-circle-exclamation"></i> Octra and AirdropALC are not responsible for any losses</li>
+                <li><i class="fas fa-circle-exclamation"></i> You are part of the AirdropALC community</li>
+                <li><i class="fas fa-circle-exclamation"></i> You understand the risks involved</li>
+            </ul>
+            <div class="checkbox-container">
+                <input type="checkbox" id="understandCheckbox">
+                <label for="understandCheckbox">I understand and accept these terms</label>
+            </div>
+            <button id="closeWarning" class="close-btn" disabled>Continue to Platform</button>
+        </div>
+    </div>
+
+    <script>
+        const fileList = document.getElementById('fileList');
+        const searchInput = document.getElementById('searchInput');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const totalFilesSpan = document.getElementById('totalFiles');
+        const availableFilesSpan = document.getElementById('availableFiles');
+        const walletGenerationLink = document.getElementById('walletGeneration');
+
+        const fileTypeIcons = {
+            image: 'fa-file-image',
+            document: 'fa-file-pdf',
+            code: 'fa-file-code',
+            other: 'fa-file'
+        };
+
+        const warningPopup = document.getElementById('warningPopup');
+        const closeWarning = document.getElementById('closeWarning');
+        const understandCheckbox = document.getElementById('understandCheckbox');
+
+        if (!localStorage.getItem('warningAccepted')) {
+            setTimeout(() => {
+                warningPopup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }, 1000);
+        }
+
+        understandCheckbox.addEventListener('change', (e) => {
+            closeWarning.disabled = !e.target.checked;
+            if (!e.target.checked) {
+                closeWarning.classList.remove('pulse');
+            } else {
+                closeWarning.classList.add('pulse');
+            }
+        });
+
+        closeWarning.addEventListener('click', () => {
+            warningPopup.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+            localStorage.setItem('warningAccepted', 'true');
+        });
+
+        async function fetchFiles() {
+            try {
+                const response = await fetch('/api/files');
+                const files = await response.json();
+                renderFiles(files);
+                updateStats(files);
+            } catch (error) {
+                console.error('Error fetching files:', error);
+                fileList.innerHTML = `<tr><td colspan="6" class="error">Error loading files. Please try again.</td></tr>`;
+            }
+        }
+        
+        function renderFiles(files) {
+            fileList.innerHTML = '';
+            
+            if (files.length === 0) {
+                fileList.innerHTML = `<tr><td colspan="6" class="empty">No files found in directory.</td></tr>`;
+                return;
+            }
+            
+            files.forEach(file => {
+                const row = document.createElement('tr');
+                const fileIcon = fileTypeIcons[file.type] || fileTypeIcons.other;
+                
+                row.innerHTML = `
+                    <td>
+                        <i class="fas ${fileIcon} file-icon"></i>
+                        ${file.name}
+                    </td>
+                    <td>${file.type}</td>
+                    <td>${formatFileSize(file.size)}</td>
+                    <td>${new Date(file.lastModified).toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge ${file.available ? 'available' : 'unavailable'}">
+                            ${file.available ? 'Available' : 'Downloaded'}
+                        </span>
+                    </td>
+                    <td>
+                        ${file.available ? 
+                            `<a href="/download/${encodeURIComponent(file.name)}" class="download-btn">
+                                <i class="fas fa-download"></i> Download
+                            </a>` : 
+                            '<span class="downloaded-text">Already downloaded</span>'}
+                    </td>
+                `;
+                
+                fileList.appendChild(row);
+            });
+        }
+        
+        function updateStats(files) {
+            totalFilesSpan.textContent = `${files.length} files`;
+            const availableCount = files.filter(f => f.available).length;
+            availableFilesSpan.textContent = `${availableCount} available`;
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const rows = fileList.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const fileName = row.querySelector('td:first-child').textContent.toLowerCase();
+                row.style.display = fileName.includes(searchTerm) ? '' : 'none';
+            });
+        });
+        
+        refreshBtn.addEventListener('click', fetchFiles);
+        
+        fetchFiles();
+        setInterval(fetchFiles, 30000);
+        
+        walletGenerationLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('https://octra-airdropalc.pagekite.me/', '_blank');
+        });
+    </script>
+</body>
+</html>
