@@ -5,7 +5,7 @@ Welcome to our community's web server project! This repository serves two primar
 1.  **A Practical Tool:** To provide a simple, lightweight web server for hosting and downloading files needed by our community.
 2.  **An Educational Example:** To serve as a clear reference for anyone wanting to learn how to build a basic web server from scratch using "vanilla" technology, without relying on heavy frameworks.
 
-![Telegram](https://img.shields.io/badge/Community-Airdrop_ALC-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/airdropalc)
+![Telegram][(https://img.shields.io/badge/Community-Airdrop_ALC-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/airdropalc)
 
 ---
 
